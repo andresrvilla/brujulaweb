@@ -10,9 +10,8 @@ public class BrujulaWebServer {
                     javalinConfig.staticFiles.add("/app");
                     javalinConfig.spaRoot.addFile("/", "/app/index.html");
                 });
-                //.get("/", ctx -> ctx.result("Hello World"));
 
-
+        
 
         app.start(8080);
     }
