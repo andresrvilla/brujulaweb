@@ -7,7 +7,7 @@
   "private": false,
   "scripts": {
     "dev": "next",
-    "build": "rm -r ../main/resources/app;next build; cp -r ./out ../main/resources/app",
+    "build": "rm -r ../main/resources/app;next build;mkdir ../main/resources; cp -r ./out ../main/resources/app",
     "start": "next start",
     "export": "next export",
     "lint": "next lint",

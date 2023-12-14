@@ -3,18 +3,29 @@ plugins {
     id("application")
 }
 
-group = "net.brujulaweb"
+group = "net.brujulaweb.application"
 version = "1.0-SNAPSHOT"
 
-repositories {
-    mavenCentral()
-}
-
 dependencies {
-    testImplementation(platform("org.junit:junit-bom:5.9.1"))
-    testImplementation("org.junit.jupiter:junit-jupiter")
+    implementation(project(":domain"))
     implementation("io.javalin:javalin:5.6.3")
     implementation("org.slf4j:slf4j-simple:2.0.7")
+    implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
+    implementation("io.jsonwebtoken:jjwt-api:0.11.2")
+    implementation("io.jsonwebtoken:jjwt-impl:0.11.2")
+    implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
+
+
+    implementation("org.projectlombok:lombok:1.18.30")
+    annotationProcessor("org.projectlombok:lombok:1.18.30")
+
+    testCompileOnly("org.projectlombok:lombok:1.18.30")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.30")
+
+
+    testImplementation(platform("org.junit:junit-bom:5.9.1"))
+    testImplementation("org.junit.jupiter:junit-jupiter")
+
 }
 
 tasks.test {
@@ -24,3 +35,5 @@ tasks.test {
 application {
     mainClass = "net.brujulaweb.server.BrujulaWebServer"
 }
+
+tasks.register("prepareKotlinBuildScriptModel"){}
