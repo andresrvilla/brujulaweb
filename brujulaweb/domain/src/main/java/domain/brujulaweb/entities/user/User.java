@@ -1,14 +1,12 @@
 package domain.brujulaweb.entities.user;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.Date;
 
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 @Getter
 @Setter
 public class User {
@@ -16,4 +14,7 @@ public class User {
     private String email;
     private String password;
     private Date lastLogin;
+    private UserStatus status;
+    private Date lockoutDate;
+    public Integer lockoutCount;
 }

@@ -1,6 +1,7 @@
 package net.brujulaweb.repository;
 
 import domain.brujulaweb.entities.user.User;
+import domain.brujulaweb.entities.user.UserStatus;
 import domain.brujulaweb.repository.UserRepository;
 
 import java.util.ArrayList;
@@ -17,17 +18,22 @@ public class MockedUserRepository implements UserRepository {
     }
 
     @Override
-    public User signup(String email, String password) {
+    public String signup(String email, String password, String status) {
         String userId = UUID.randomUUID().toString();
-        User user = new User(userId, email, password);
+        User user = User.builder()
+                .userId(userId)
+                .email(email)
+                .password(password)
+                .status(UserStatus.lookup(status))
+                .build();
         users.add(user);
-        return user;
+        return user.getUserId();
 
     }
 
     @Override
-    public Optional<User> findByEmail(String email) {
+    public User findByEmail(String email) {
         Predicate<User> query = user -> user.getEmail().equalsIgnoreCase(email);
-        return users.stream().filter(query).findFirst();
+        return users.stream().filter(query).findFirst().orElse(null);
     }
 }

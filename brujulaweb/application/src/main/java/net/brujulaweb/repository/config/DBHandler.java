@@ -1,13 +1,20 @@
 package net.brujulaweb.repository.config;
 
-public class DBHandler{
+import com.zaxxer.hikari.HikariConfig;
+import com.zaxxer.hikari.HikariDataSource;
+
+import javax.sql.DataSource;
+
+public class DBHandler {
+
     private static HikariDataSource ds;
-    static{
+
+    static {
 
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/simpsons");
-        config.setUsername("bart");
-        config.setPassword("51mp50n");
+        config.setJdbcUrl("jdbc:mysql://localhost:3306/brujula.dev");
+        config.setUsername("panda");
+        config.setPassword("panda");
         config.setDriverClassName("com.mysql.jdbc.Driver");
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
@@ -16,7 +23,9 @@ public class DBHandler{
         ds = new HikariDataSource(config);
     }
 
-    public static Connection getConn() throws SQLException {
-        return ds.getConnection();
+    public static DataSource getDataSource(){
+        return ds;
     }
 
+
+}

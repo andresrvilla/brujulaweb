@@ -23,10 +23,14 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-jackson:0.11.2")
 
     // DATABASE
+    implementation("commons-dbutils:commons-dbutils:1.8.1")
+    implementation("mysql:mysql-connector-java:8.0.33")
     implementation("com.zaxxer:HikariCP:5.1.0")
 
     testImplementation(platform("org.junit:junit-bom:5.9.1"))
     testImplementation("org.junit.jupiter:junit-jupiter")
+
+    implementation("com.password4j:password4j:1.7.3")
 
 }
 

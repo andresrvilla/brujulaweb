@@ -1,11 +1,14 @@
 package net.brujulaweb.server;
 
 import domain.brujulaweb.usecases.UserManagementUseCase;
+import domain.brujulaweb.util.Encrypter;
 import io.javalin.Javalin;
-import io.javalin.http.staticfiles.Location;
-import net.brujulaweb.repository.MockedUserRepository;
+import net.brujulaweb.repository.config.DBHandler;
+import net.brujulaweb.repository.user.UserDBRepository;
 import net.brujulaweb.server.endpoints.users.UserEndpoints;
 import net.brujulaweb.server.security.JjwtTokenManager;
+import net.brujulaweb.util.BcryptEncrypter;
+
 
 public class BrujulaWebServer {
     public static void main(String[] args) {
@@ -16,8 +19,9 @@ public class BrujulaWebServer {
                     javalinConfig.plugins.enableDevLogging();
                 });
         JjwtTokenManager tokenManager = new JjwtTokenManager();
-        MockedUserRepository mockedUserRepository = new MockedUserRepository();
-        UserManagementUseCase useCase = new UserManagementUseCase(tokenManager,mockedUserRepository);
+        UserDBRepository userRepository = new UserDBRepository(DBHandler.getDataSource());
+        Encrypter encrypter = new BcryptEncrypter();
+        UserManagementUseCase useCase = new UserManagementUseCase(tokenManager,encrypter,userRepository);
         UserEndpoints userEndpoints = new UserEndpoints(useCase);
 
         app.before("/api/protected/*", userEndpoints::authorize);
