@@ -2,8 +2,10 @@ package net.brujulaweb.server.endpoints.users;
 
 import domain.brujulaweb.entities.user.AuthResponse;
 import domain.brujulaweb.entities.user.AuthRequest;
+import domain.brujulaweb.exceptions.EntityConflictException;
 import domain.brujulaweb.exceptions.UnauthorizedException;
 import domain.brujulaweb.usecases.UserManagementUseCase;
+import io.javalin.http.ConflictResponse;
 import io.javalin.http.Context;
 import io.javalin.http.ForbiddenResponse;
 
@@ -27,13 +29,13 @@ public class UserEndpoints {
         try {
             AuthResponse result = useCase.login(request);
             context.json(result);
-        }catch(UnauthorizedException exception){
+        } catch (UnauthorizedException exception) {
             throw new ForbiddenResponse();
         }
 
     }
 
-    public void signup (Context context){
+    public void signup(Context context) {
         AuthRequest request = context.bodyAsClass(AuthRequest.class);
         /*Validator validator = new Validator();
         List<ConstraintViolation> violations = validator.validate(request);
@@ -43,18 +45,22 @@ public class UserEndpoints {
                     .collect(Collectors.joining(", "));
             throw new BadRequestResponse(message);
         }*/
-        AuthResponse result = useCase.signup(request);
-        context.json(result);
+        try {
+            AuthResponse result = useCase.signup(request);
+            context.json(result);
+        } catch (EntityConflictException exception) {
+            throw new ConflictResponse();
+        }
     }
 
-    public void authorize (Context context){
+    public void authorize(Context context) {
         String token = context.header("Authorization");
         String userId = context.header("X-User-ID");
-        if (token == null){
+        if (token == null) {
             throw new ForbiddenResponse();
         }
         boolean result = useCase.authorize(token, userId);
-        if (!result){
+        if (!result) {
             throw new ForbiddenResponse();
         }
     }

@@ -19,6 +19,10 @@ public class DBHandler {
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
+        config.setMaximumPoolSize(20);
+        config.setConnectionTimeout(300000);
+        config.setConnectionTimeout(120000);
+        config.setLeakDetectionThreshold(300000);
 
         ds = new HikariDataSource(config);
     }

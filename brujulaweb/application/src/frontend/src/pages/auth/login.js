@@ -25,20 +25,20 @@ const Page = () => {
   const [method, setMethod] = useState('email');
   const formik = useFormik({
     initialValues: {
-      email: 'demo@devias.io',
-      password: 'Password123!',
+      email: '',
+      password: '',
       submit: null
     },
     validationSchema: Yup.object({
       email: Yup
         .string()
-        .email('Must be a valid email')
+        .email('Debe ser un Email válido')
         .max(255)
-        .required('Email is required'),
+        .required('Email es requerido'),
       password: Yup
         .string()
         .max(255)
-        .required('Password is required')
+        .required('Contraseña es requerida')
     }),
     onSubmit: async (values, helpers) => {
       try {
@@ -97,7 +97,7 @@ const Page = () => {
               sx={{ mb: 3 }}
             >
               <Typography variant="h4">
-                Ingresar a BrujulaWEB
+                Ingresar
               </Typography>
             </Stack>
             <form
@@ -109,7 +109,7 @@ const Page = () => {
                   error={!!(formik.touched.email && formik.errors.email)}
                   fullWidth
                   helperText={formik.touched.email && formik.errors.email}
-                  label="Email Address"
+                  label="Email"
                   name="email"
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}
@@ -120,7 +120,7 @@ const Page = () => {
                   error={!!(formik.touched.password && formik.errors.password)}
                   fullWidth
                   helperText={formik.touched.password && formik.errors.password}
-                  label="Password"
+                  label="Contraseña"
                   name="password"
                   onBlur={formik.handleBlur}
                   onChange={formik.handleChange}

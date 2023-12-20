@@ -79,7 +79,7 @@ export const Layout = (props) => {
               }}
               variant="h1"
             >
-              Brujula WEB
+              Ingresar a Brujula WEB
             </Typography>
             <Typography
               align="center"

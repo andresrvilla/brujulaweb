@@ -1,87 +1,77 @@
 package net.brujulaweb.repository.user;
 
 import domain.brujulaweb.entities.user.User;
+import domain.brujulaweb.entities.user.UserStatus;
 import domain.brujulaweb.repository.UserRepository;
+import net.brujulaweb.repository.DBRepository;
 import org.apache.commons.dbutils.QueryRunner;
 
+import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.UUID;
 import javax.sql.DataSource;
 
-public class UserDBRepository implements UserRepository {
+import static domain.brujulaweb.util.DateUtils.fromTimestamp;
+
+public class UserDBRepository extends DBRepository<User> implements UserRepository {
 
     public static final String INSERT_USER = "INSERT INTO user " +
-            "(id,email,password, status) VALUES " +
-            "(?,?,?,?)";
-
+            "(email,password, status) VALUES " +
+            "(?,?,?)";
 
     public static final String GET_USER_BY_MAIL = "SELECT * FROM user " +
             "WHERE UPPER(email) = UPPER(?);";
 
-    public static final String UPDATE_USER = "";
-
-    public static final String DELETE_USER = "";
-    private final QueryRunner queryRunner;
-
-    private final DataSource dataSource;
+    public static final String UPDATE_USER = "UPDATE user SET " +
+            "status = ? , lockout_count = ?, lockout_date = ?, last_login = ? " +
+            "WHERE id = ?";
 
     public UserDBRepository(DataSource dataSource) {
-        this.queryRunner = new QueryRunner();
-        this.dataSource = dataSource;
+        super(dataSource);
     }
 
+
     @Override
-    public String signup(String email, String password, String status) {
-        try {
-            UUID uuid = UUID.randomUUID();
-
-            queryRunner.insert(dataSource.getConnection(),
-                    INSERT_USER,
-                    this::idHandler,
-                    uuid.toString(),
-                    email,
-                    password,
-                    status);
-
-            return uuid.toString();
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+    public Integer signup(String email, String password, String status) {
+        return executeInsert(INSERT_USER,
+                email,
+                password,
+                status);
     }
 
     @Override
     public User findByEmail(String email) {
-        try {
-            return queryRunner.query(dataSource.getConnection(),
-                    GET_USER_BY_MAIL,
-                    this::handler,
-                    email);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        return executeSelect(GET_USER_BY_MAIL, this::handler, email);
+    }
+
+    @Override
+    public void update(Integer userId, String status, int lookout_count, ZonedDateTime lookout_date, ZonedDateTime login_date) {
+        executeUpdate(UPDATE_USER,
+                status,
+                lookout_count,
+                lookout_date,
+                login_date,
+                userId);
     }
 
     private User handler(ResultSet resultSet) throws SQLException {
         if (resultSet.next()) {
             return User.builder()
-                    .userId(resultSet.getString("id"))
+                    .userId(resultSet.getInt("id"))
                     .email(resultSet.getString("email"))
-                    .lastLogin(resultSet.getDate("last_login"))
+                    .lastLogin(fromTimestamp(resultSet.getTimestamp("last_login")))
                     .password(resultSet.getString("password"))
-                    .lockoutDate(resultSet.getDate("lockout_date"))
+                    .lockoutDate(fromTimestamp(resultSet.getTimestamp("lockout_date")))
                     .lockoutCount(resultSet.getInt("lockout_count"))
+                    .status(UserStatus.lookup(resultSet.getString("status")))
                     .build();
         }
         return null;
     }
 
-    private String idHandler(ResultSet resultSet) throws SQLException {
-        if(resultSet.next()){
-            return resultSet.getString(1);
-        }
-        return null;
-    }
 
 
 
