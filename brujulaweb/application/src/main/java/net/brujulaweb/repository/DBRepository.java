@@ -1,6 +1,5 @@
 package net.brujulaweb.repository;
 
-import domain.brujulaweb.entities.user.User;
 import org.apache.commons.dbutils.QueryRunner;
 import org.apache.commons.dbutils.ResultSetHandler;
 
@@ -34,7 +33,7 @@ public class DBRepository<T> {
         }
     }
 
-    public T executeSelect(String cmd, ResultSetHandler<T> handler, Object... params){
+    public T executeSelect(String cmd, ResultSetHandler<T> handler, Object... params) {
         Connection connection = null;
         try {
             connection = this.queryRunner.getDataSource().getConnection();
@@ -46,7 +45,7 @@ public class DBRepository<T> {
             return obj;
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
+        } finally {
             try {
                 if (connection != null) {
                     connection.close();
@@ -57,17 +56,17 @@ public class DBRepository<T> {
         }
     }
 
-    public void executeUpdate(String cmd, Object... params){
+    public void executeUpdate(String cmd, Object... params) {
         Connection connection = null;
         try {
             connection = this.queryRunner.getDataSource().getConnection();
-           queryRunner.update(connection,
+            queryRunner.update(connection,
                     cmd,
                     params);
             connection.close();
         } catch (SQLException e) {
             throw new RuntimeException(e);
-        }finally {
+        } finally {
             try {
                 if (connection != null) {
                     connection.close();
@@ -79,7 +78,7 @@ public class DBRepository<T> {
     }
 
     private Integer getId(ResultSet resultSet) throws SQLException {
-        if(resultSet.next()){
+        if (resultSet.next()) {
             return resultSet.getInt(1);
         }
         return null;

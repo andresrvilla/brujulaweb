@@ -8,6 +8,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import io.jsonwebtoken.security.SignatureException;
+import net.brujulaweb.repository.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,7 +20,8 @@ public class JjwtTokenManager implements TokenManager {
     private final Key key;
 
     public JjwtTokenManager() {
-        this.key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        //this.key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
+        this.key = Keys.hmacShaKeyFor(Config.get("server.security.jwtkey").getBytes());
     }
 
     @Override

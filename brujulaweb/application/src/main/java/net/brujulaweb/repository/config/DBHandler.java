@@ -12,16 +12,16 @@ public class DBHandler {
     static {
 
         HikariConfig config = new HikariConfig();
-        config.setJdbcUrl("jdbc:mysql://localhost:3306/brujula.dev");
-        config.setUsername("panda");
-        config.setPassword("panda");
+        //config.setJdbcUrl("jdbc:mysql://localhost:3306/brujula.dev");
+        config.setJdbcUrl(Config.get("db.jdbcUrl"));
+        config.setUsername(Config.get("db.user"));
+        config.setPassword(Config.get("db.password"));
         config.setDriverClassName("com.mysql.jdbc.Driver");
         config.addDataSourceProperty("cachePrepStmts", "true");
         config.addDataSourceProperty("prepStmtCacheSize", "250");
         config.addDataSourceProperty("prepStmtCacheSqlLimit", "2048");
-        config.setMaximumPoolSize(20);
-        config.setConnectionTimeout(300000);
-        config.setConnectionTimeout(120000);
+        config.setMaximumPoolSize(Config.getInt("db.maximumPoolSize"));
+        config.setConnectionTimeout(Config.getInt("db.connectionTimeout"));
         config.setLeakDetectionThreshold(300000);
 
         ds = new HikariDataSource(config);
