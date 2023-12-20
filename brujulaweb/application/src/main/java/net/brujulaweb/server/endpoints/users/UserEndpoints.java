@@ -1,5 +1,7 @@
 package net.brujulaweb.server.endpoints.users;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import domain.brujulaweb.entities.user.AuthResponse;
 import domain.brujulaweb.entities.user.AuthRequest;
 import domain.brujulaweb.exceptions.EntityConflictException;
@@ -8,13 +10,13 @@ import domain.brujulaweb.usecases.UserManagementUseCase;
 import io.javalin.http.ConflictResponse;
 import io.javalin.http.Context;
 import io.javalin.http.ForbiddenResponse;
+import lombok.AllArgsConstructor;
 
+
+@AllArgsConstructor(onConstructor = @__({ @Inject}))
+@Singleton
 public class UserEndpoints {
     private UserManagementUseCase useCase;
-
-    public UserEndpoints(UserManagementUseCase useCase) {
-        this.useCase = useCase;
-    }
 
     public void login(Context context) {
         //Validator validator = new Validator();

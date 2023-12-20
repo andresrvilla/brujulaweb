@@ -1,5 +1,7 @@
 package domain.brujulaweb.usecases;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import domain.brujulaweb.entities.user.AuthRequest;
 import domain.brujulaweb.entities.user.AuthResponse;
 import domain.brujulaweb.entities.user.User;
@@ -13,11 +15,13 @@ import lombok.AllArgsConstructor;
 
 import java.time.ZonedDateTime;
 
-@AllArgsConstructor
+@AllArgsConstructor(onConstructor = @__({ @Inject}))
+@Singleton
 public class UserManagementUseCase {
 
     private static final Integer MAX_LOCKOUT_COUNT = 3;
     private static final long LOCKOUT_MINUTES = 60L;
+
 
     private final TokenManager tokenManager;
 

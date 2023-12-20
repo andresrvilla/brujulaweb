@@ -1,5 +1,7 @@
 package net.brujulaweb.repository.user;
 
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import domain.brujulaweb.entities.user.User;
 import domain.brujulaweb.entities.user.UserStatus;
 import domain.brujulaweb.repository.UserRepository;
@@ -16,6 +18,7 @@ import javax.sql.DataSource;
 
 import static domain.brujulaweb.util.DateUtils.fromTimestamp;
 
+@Singleton
 public class UserDBRepository extends DBRepository<User> implements UserRepository {
 
     public static final String INSERT_USER = "INSERT INTO user " +
@@ -29,6 +32,7 @@ public class UserDBRepository extends DBRepository<User> implements UserReposito
             "status = ? , lockout_count = ?, lockout_date = ?, last_login = ? " +
             "WHERE id = ?";
 
+    @Inject
     public UserDBRepository(DataSource dataSource) {
         super(dataSource);
     }

@@ -31,6 +31,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter")
 
     implementation("com.password4j:password4j:1.7.3")
+    implementation("com.google.inject:guice:7.0.0")
 
 }
 
