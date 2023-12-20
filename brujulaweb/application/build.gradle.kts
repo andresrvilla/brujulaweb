@@ -16,7 +16,8 @@ dependencies {
 
     //WEB
     implementation("io.javalin:javalin:5.6.3")
-    implementation("org.slf4j:slf4j-simple:2.0.7")
+    implementation("org.slf4j:slf4j-api:2.0.7")
+    implementation("ch.qos.logback:logback-classic:1.4.6")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
     implementation("io.jsonwebtoken:jjwt-api:0.11.2")
     implementation("io.jsonwebtoken:jjwt-impl:0.11.2")

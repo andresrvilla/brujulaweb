@@ -22,7 +22,7 @@ public class BrujulaWebServer {
                 {
                     javalinConfig.staticFiles.add("/app");
                     javalinConfig.spaRoot.addFile("/", "/app/index.html");
-                    javalinConfig.plugins.enableDevLogging();
+                    //javalinConfig.plugins.enableDevLogging();
                 });
 
         Injector injector = Guice.createInjector(

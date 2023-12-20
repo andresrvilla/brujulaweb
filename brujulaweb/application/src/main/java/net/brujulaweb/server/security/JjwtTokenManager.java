@@ -7,10 +7,15 @@ import io.javalin.http.ForbiddenResponse;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.security.Key;
 
 public class JjwtTokenManager implements TokenManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(JjwtTokenManager.class);
     private final Key key;
 
     public JjwtTokenManager() {
@@ -19,15 +24,28 @@ public class JjwtTokenManager implements TokenManager {
 
     @Override
     public String issueToken(String userId) {
-        return Jwts.builder().setSubject(userId).signWith(key).compact();
+        return Jwts.builder().
+                setSubject(userId)
+                .signWith(key)
+                .compact();
     }
 
     @Override
     public boolean authorize(String token, String userId) {
         try {
-            String subject = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody().getSubject();
+            String subject = Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .getSubject();
             return subject.equalsIgnoreCase(userId);
-        } catch (Exception ex){
+        } catch (SignatureException ex) {
+            logger.info(String.format("Invalid signature when login user %s", userId));
+            throw new ForbiddenResponse();
+        } catch (
+                Exception ex) {
+            logger.error("authorize Exception", ex);
             throw new ForbiddenResponse();
         }
     }

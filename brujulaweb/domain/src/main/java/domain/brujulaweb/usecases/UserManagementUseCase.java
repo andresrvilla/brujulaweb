@@ -14,6 +14,8 @@ import domain.brujulaweb.util.Encrypter;
 import lombok.AllArgsConstructor;
 
 import java.time.ZonedDateTime;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @AllArgsConstructor(onConstructor = @__({ @Inject}))
 @Singleton
@@ -22,6 +24,7 @@ public class UserManagementUseCase {
     private static final Integer MAX_LOCKOUT_COUNT = 3;
     private static final long LOCKOUT_MINUTES = 60L;
 
+    private static final Logger logger = LoggerFactory.getLogger(UserManagementUseCase.class);
 
     private final TokenManager tokenManager;
 
@@ -57,10 +60,12 @@ public class UserManagementUseCase {
                 userRepository.update(user.getUserId(), user.getStatus().name(), 0, null, ZonedDateTime.now());
                 return new AuthResponse(email, token);
             } else {
+                logger.warn(String.format("User %s is trying to use an invalid password", email));
                 verifyLookout(user);
                 throw new UnauthorizedException();
             }
         } else {
+            logger.warn(String.format("User %s does not exist or invalid status", email));
             throw new UnauthorizedException();
         }
     }
@@ -74,6 +79,10 @@ public class UserManagementUseCase {
     }
 
     public boolean authorize(String token, String userId) {
-        return tokenManager.authorize(token, userId);
+        boolean isAuthorized = tokenManager.authorize(token, userId);
+        if(!isAuthorized){
+            logger.warn(String.format("User %s is trying to use an invalid token", userId));
+        }
+        return isAuthorized;
     }
 }
