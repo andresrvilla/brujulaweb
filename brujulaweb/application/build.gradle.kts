@@ -17,7 +17,7 @@ dependencies {
     //WEB
     implementation("io.javalin:javalin:5.6.3")
     implementation("org.slf4j:slf4j-api:2.0.7")
-    implementation("ch.qos.logback:logback-classic:1.4.6")
+    implementation("ch.qos.logback:logback-classic:1.4.14")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.0")
     implementation("io.jsonwebtoken:jjwt-api:0.11.2")
     implementation("io.jsonwebtoken:jjwt-impl:0.11.2")
@@ -33,6 +33,9 @@ dependencies {
 
     implementation("com.password4j:password4j:1.7.3")
     implementation("com.google.inject:guice:7.0.0")
+
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-lang3
+    implementation("org.apache.commons:commons-lang3:3.14.0")
 
 }
 
