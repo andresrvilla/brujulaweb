@@ -6,9 +6,9 @@ import java.time.ZonedDateTime;
 
 public interface UserRepository {
 
-    Integer signup (String email, String password, String status);
+    Integer signup (String email, String password, int association);
 
     User findByEmail (String email);
 
-    void update(Integer userId, String status, int lookout_count, ZonedDateTime lookout_date, ZonedDateTime login_date);
+    void updateSignup(String email, Integer userId, String status, int lookout_count, ZonedDateTime lookout_date, ZonedDateTime login_date);
 }

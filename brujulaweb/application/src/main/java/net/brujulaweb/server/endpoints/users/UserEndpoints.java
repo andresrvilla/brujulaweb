@@ -7,10 +7,8 @@ import domain.brujulaweb.entities.user.AuthRequest;
 import domain.brujulaweb.exceptions.EntityConflictException;
 import domain.brujulaweb.exceptions.UnauthorizedException;
 import domain.brujulaweb.usecases.UserManagementUseCase;
-import io.javalin.http.BadRequestResponse;
-import io.javalin.http.ConflictResponse;
-import io.javalin.http.Context;
-import io.javalin.http.ForbiddenResponse;
+import io.javalin.Javalin;
+import io.javalin.http.*;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,9 +16,15 @@ import org.apache.commons.lang3.StringUtils;
 @AllArgsConstructor(onConstructor = @__({@Inject}))
 @Singleton
 public class UserEndpoints {
-    private UserManagementUseCase useCase;
+    private final UserManagementUseCase useCase;
 
-    public void login(Context context) {
+    public void registerEndpoints(Javalin app) {
+        app.before("/api/protected/*", this::authorize);
+        app.post("/api/login", this::login);
+        app.post("/api/signup", this::signup);
+    }
+
+    private void login(Context context) {
         AuthRequest request = context.bodyAsClass(AuthRequest.class);
 
         if (StringUtils.isEmpty(request.getEmail()) ||
@@ -37,7 +41,7 @@ public class UserEndpoints {
 
     }
 
-    public void signup(Context context) {
+    private void signup(Context context) {
         AuthRequest request = context.bodyAsClass(AuthRequest.class);
 
         if (StringUtils.isEmpty(request.getEmail()) ||
@@ -53,17 +57,21 @@ public class UserEndpoints {
         }
     }
 
-    public void authorize(Context context) {
+    private void authorize(Context context) {
         String token = context.header("Authorization");
         String userId = context.header("X-User-ID");
         if (StringUtils.isEmpty(token) ||
                 StringUtils.isEmpty(userId)) {
-            throw new ForbiddenResponse();
+            throw new UnauthorizedResponse();
         }
 
         boolean result = useCase.authorize(token, userId);
+
         if (!result) {
-            throw new ForbiddenResponse();
+            throw new UnauthorizedResponse();
         }
+
+        context.sessionAttribute("user_id", userId);
     }
+
 }

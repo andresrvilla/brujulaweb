@@ -10,6 +10,7 @@ import domain.brujulaweb.exceptions.EntityConflictException;
 import domain.brujulaweb.exceptions.UnauthorizedException;
 import domain.brujulaweb.repository.UserRepository;
 import domain.brujulaweb.security.TokenManager;
+import domain.brujulaweb.util.DateUtils;
 import domain.brujulaweb.util.Encrypter;
 import lombok.AllArgsConstructor;
 
@@ -39,7 +40,7 @@ public class UserManagementUseCase {
             throw new EntityConflictException();
         }
         String password = encrypter.encrypt(request.getPassword().trim());
-        userRepository.signup(email, password, UserStatus.ACTIVE.name());
+        userRepository.signup(email, password, request.getAssociation());
         String token = tokenManager.issueToken(email);
         return new AuthResponse(email, token);
     }
@@ -57,7 +58,7 @@ public class UserManagementUseCase {
             String hash = user.getPassword();
             if (encrypter.verify(password, hash)) {
                 String token = tokenManager.issueToken(user.getEmail());
-                userRepository.update(user.getUserId(), user.getStatus().name(), 0, null, ZonedDateTime.now());
+                userRepository.updateSignup(email, user.getUserId(), user.getStatus().name(), 0, null, DateUtils.now());
                 return new AuthResponse(email, token);
             } else {
                 logger.warn(String.format("User %s is trying to use an invalid password", email));
@@ -71,10 +72,10 @@ public class UserManagementUseCase {
     }
 
     private void verifyLookout(User user) {
-        if (user.getLockoutCount() > MAX_LOCKOUT_COUNT && user.getLockoutDate().plusMinutes(LOCKOUT_MINUTES).isAfter(ZonedDateTime.now())) {
-            userRepository.update(user.getUserId(), UserStatus.BLOCKED.name(), user.getLockoutCount() + 1, ZonedDateTime.now(), user.getLastLogin());
+        if (user.getLockoutCount() > MAX_LOCKOUT_COUNT && user.getLockoutDate().plusMinutes(LOCKOUT_MINUTES).isAfter(DateUtils.now())) {
+            userRepository.updateSignup(user.getEmail(), user.getUserId(), UserStatus.BLOCKED.name(), user.getLockoutCount() + 1, DateUtils.now(), user.getLastLogin());
         } else {
-            userRepository.update(user.getUserId(), user.getStatus().name(), (user.getLockoutCount() == null ? 0 : user.getLockoutCount()) + 1, ZonedDateTime.now(), user.getLastLogin());
+            userRepository.updateSignup(user.getEmail(), user.getUserId(), user.getStatus().name(), (user.getLockoutCount() == null ? 0 : user.getLockoutCount()) + 1, DateUtils.now(), user.getLastLogin());
         }
     }
 
@@ -84,5 +85,9 @@ public class UserManagementUseCase {
             logger.warn(String.format("User %s is trying to use an invalid token", userId));
         }
         return isAuthorized;
+    }
+
+    public User findByEmail(String email) {
+       return userRepository.findByEmail(email);
     }
 }

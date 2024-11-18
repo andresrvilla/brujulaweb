@@ -3,11 +3,10 @@ package net.brujulaweb.server;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.javalin.Javalin;
+import io.javalin.plugin.bundled.RouteOverviewPlugin;
+import net.brujulaweb.server.endpoints.association.AssociationEndpoints;
 import net.brujulaweb.server.endpoints.users.UserEndpoints;
-import net.brujulaweb.server.modules.BasicModule;
-import net.brujulaweb.server.modules.EntryPointModule;
-import net.brujulaweb.server.modules.RepositoryModule;
-import net.brujulaweb.server.modules.UseCaseModule;
+import net.brujulaweb.server.modules.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,20 +21,27 @@ public class BrujulaWebServer {
             javalinConfig.staticFiles.add("/app");
             javalinConfig.spaRoot.addFile("/", "/app/index.html");
             //javalinConfig.plugins.enableDevLogging();
+
+            javalinConfig.plugins.enableRouteOverview("/overview");                      // show all routes on specified path
+            //javalinConfig.plugins.enableRouteOverview(path, roles);               // show all routes on specified path (with auth)
+            //javalinConfig.plugins.register(new RouteOverviewPlugin(path));        // show all routes on specified path
+            //javalinConfig.plugins.register(new RouteOverviewPlugin(path, roles)); // show all routes on specified path (with auth)
         });
 
         Injector injector = Guice.createInjector(
                 new BasicModule(),
                 new EntryPointModule(),
                 new RepositoryModule(),
-                new UseCaseModule()
+                new UseCaseModule(),
+                new CacheModule()
         );
 
-        UserEndpoints userEndpoints = injector.getInstance(UserEndpoints.class);
+        app.before("*", (ctx) -> System.out.println(ctx.url()));
 
-        app.before("/api/protected/*", userEndpoints::authorize);
-        app.post("/api/login", userEndpoints::login);
-        app.post("/api/signup", userEndpoints::signup);
+        UserEndpoints userEndpoints = injector.getInstance(UserEndpoints.class);
+        userEndpoints.registerEndpoints(app);
+        AssociationEndpoints associationEndpoints = injector.getInstance(AssociationEndpoints.class);
+        associationEndpoints.registerEndpoints(app);
 
         app.start(8080);
     }

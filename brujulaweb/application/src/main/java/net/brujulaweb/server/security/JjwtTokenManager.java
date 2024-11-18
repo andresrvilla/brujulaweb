@@ -3,7 +3,9 @@ package net.brujulaweb.server.security;
 import domain.brujulaweb.security.TokenManager;
 
 
+import domain.brujulaweb.util.DateUtils;
 import io.javalin.http.ForbiddenResponse;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -13,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.security.Key;
+import java.util.Date;
 
 public class JjwtTokenManager implements TokenManager {
 
@@ -26,8 +29,10 @@ public class JjwtTokenManager implements TokenManager {
 
     @Override
     public String issueToken(String userId) {
-        return Jwts.builder().
-                setSubject(userId)
+        Date expirationDate = Date.from(DateUtils.now().plusMinutes(60).toInstant());
+        return Jwts.builder()
+                .setExpiration(expirationDate)
+                .setSubject(userId)
                 .signWith(key)
                 .compact();
     }
@@ -35,13 +40,10 @@ public class JjwtTokenManager implements TokenManager {
     @Override
     public boolean authorize(String token, String userId) {
         try {
-            String subject = Jwts.parserBuilder()
-                    .setSigningKey(key)
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
+            String subject = getClaims(token)
                     .getSubject();
-            return subject.equalsIgnoreCase(userId);
+
+            return subject.equalsIgnoreCase(userId) && getClaims(token).getExpiration().after( Date.from(DateUtils.now().toInstant()));
         } catch (SignatureException ex) {
             logger.info(String.format("Invalid signature when login user %s", userId));
             throw new ForbiddenResponse();
@@ -50,5 +52,13 @@ public class JjwtTokenManager implements TokenManager {
             logger.error("authorize Exception", ex);
             throw new ForbiddenResponse();
         }
+    }
+
+    private Claims getClaims(String token) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
     }
 }
