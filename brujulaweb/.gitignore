@@ -44,4 +44,4 @@ bin/
 ### FRONTEND ###
 
 application/src/main/resources/app/**
-/*.log
+/logs

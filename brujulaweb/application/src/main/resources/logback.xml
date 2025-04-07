@@ -14,7 +14,7 @@
 
     <appender name="File" class="RollingFileAppender">
         <rollingPolicy class="SizeAndTimeBasedRollingPolicy">
-            <fileNamePattern>brujulaweb.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>logs/brujulaweb.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <maxHistory>30</maxHistory>
             <maxFileSize>1MB</maxFileSize>
             <totalSizeCap>1GB</totalSizeCap>

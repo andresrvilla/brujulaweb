@@ -27,6 +27,14 @@ public class AssociacionDBRepository extends DBRepository<Association> implement
             "id, name, creation_date, creation_user, modification_date, modification_user, status, taxonomy " +
             "FROM association " +
             "WHERE id = ? AND status = ? ";
+
+    private static final String UPDATE_ASSOCIATION = "UPDATE association SET " +
+            "name = ?, " +
+            "modification_date = ?, " +
+            "modification_user = ?, " +
+            "status = ?, " +
+            "taxonomy = ? " +
+            "WHERE id = ?";
     private final Cache<String, Association> associationCache;
 
     @Inject
@@ -45,6 +53,25 @@ public class AssociacionDBRepository extends DBRepository<Association> implement
         }
 
         return association;
+    }
+
+
+    @Override
+    public Association update(int id, Association association) {
+
+        executeUpdate(UPDATE_ASSOCIATION,
+                association.getName(),
+                association.getModificationDate(),
+                association.getModificationUser(),
+                association.getStatus().name(),
+                association.getTaxonomy(),
+                id);
+
+        // Clear the cache for the updated association
+        associationCache.invalidate(String.valueOf(id));
+
+        // Return the updated association
+        return getById(id);
     }
 
     private Association handler(ResultSet resultSet) throws SQLException {
